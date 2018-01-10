@@ -10,9 +10,10 @@ class Settings():
 
         # Настройки корабля
         self.ship_speed_factor = 1.5
+        self.ship_limit = 3
 
         # Параметры пули
-        self.bullet_speed_factor = 1
+        self.bullet_speed_factor = 3
         #self.bullet_width = 3
         self.bullet_width = self.screen_width / 2 # для тестирования
         self.bullet_height = 15
@@ -21,6 +22,6 @@ class Settings():
         self.bullet_inside = False
 
         # Настройки пришельцев
-        self.alien_speed_factor = 0.5
+        self.alien_speed_factor = 5
         self.fleet_drop_speed = 10  #величина снижения флота при достижении края
         self.fleet_direction = 1    #1 - движение вправо, -1 - движение влево

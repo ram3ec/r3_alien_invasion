@@ -3,6 +3,7 @@ import pygame
 
 from bullet import Bullet
 from alien import Alien
+from time import sleep
 
 def fire_bullet(ai_settings, screen, ship, bullets):
     """Выпускает пулю, если максимум еще не достигнут"""
@@ -74,6 +75,15 @@ def update_screen(ai_settings, screen, ship, aliens, bullets):
     #отображение последнего прорисованного экрана
     pygame.display.flip()
 
+def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
+    """Обработка коллизий пуль с пришельцами."""
+    # Удаление пуль и пришельцев, участвующих в коллизиях.
+    collisions = pygame.sprite.groupcollide(bullets, aliens, ai_settings.bullet_inside, True)
+    if len(aliens) == 0:
+        # Уничтожение существующих пуль и создание нового флота.
+        bullets.empty()
+        create_fleet(ai_settings, screen, ship, aliens)
+
 def update_bullets(ai_settings, screen, ship, aliens, bullets):
     """Обновляет позиции пуль и уничтожает старые пули"""
     bullets.update()
@@ -82,15 +92,8 @@ def update_bullets(ai_settings, screen, ship, aliens, bullets):
     for bullet in bullets.copy():
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
-            # print(len(bullets))
 
-    # проверка попадания в пришельце
-    collisions = pygame.sprite.groupcollide(bullets, aliens, ai_settings.bullet_inside, True)
-
-    # если уничножили весь флот, то создаем снова
-    if len(aliens) == 0:
-        bullets.empty()
-        create_fleet(ai_settings, screen, ship, aliens)
+    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
 
 def get_number_aliens_x(ai_settings, alien_width):
     """Вычисляет количество пришельцев в ряду."""
@@ -113,6 +116,7 @@ def get_number_rows(ai_settings, ship_height, alien_height):
     number_rows = int(available_space_y / (2 * alien_height))
     return number_rows
 
+
 def create_fleet(ai_settings, screen, ship, aliens):
     """Создает флот пришельцев"""
     alien = Alien(ai_settings, screen)
@@ -124,10 +128,48 @@ def create_fleet(ai_settings, screen, ship, aliens):
         for alien_number in range(number_aliens_x):
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
-def update_aliens(ai_settings, aliens):
+
+def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+    """Обрабатывает столкновение корабля с пришельцем."""
+    if stats.ships_left > 0:
+        # Уменьшение ships_left.
+        stats.ships_left -= 1
+
+        # Очистка списков пришельцев и пуль.
+        aliens.empty()
+        bullets.empty()
+
+        # Создание нового флота и размещение корабля в центре.
+        create_fleet(ai_settings, screen, ship, aliens)
+        ship.center_ship()
+
+        # Пауза.
+        sleep(1)
+    else:
+        stats.game_active = False
+
+
+def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+    """Проверяет, добрались ли пришельцы до нижнего края экрана."""
+    screen_rect = screen.get_rect()
+    for alien in aliens.sprites():
+        if alien.rect.bottom >= screen_rect.bottom:
+           # Происходит то же, что при столкновении с кораблем.
+            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            break
+
+
+def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     """Обновляет позиции всех пришельцев во флоте"""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
+
+    #проверка коллизии пришелец - корабдь
+    if pygame.sprite.spritecollideany(ship, aliens):
+        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+
+    #проверка добрался ли пришелец до нижнего края
+    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
 
 def check_fleet_edges(ai_settings, aliens):
     """Реагирует на достижение пришельцем края экрана."""
