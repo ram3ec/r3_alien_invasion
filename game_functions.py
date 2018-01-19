@@ -144,7 +144,7 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
         ship.center_ship()
 
         # Пауза.
-        sleep(1)
+        sleep(ai_settings.game_pause)
     else:
         stats.game_active = False
 

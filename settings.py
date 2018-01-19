@@ -25,3 +25,6 @@ class Settings():
         self.alien_speed_factor = 2 # скорость пришельцев
         self.fleet_drop_speed = 10  #величина снижения флота при достижении края
         self.fleet_direction = 1    #1 - движение вправо, -1 - движение влево
+
+        # Настройка игры
+        self.game_pause = 2              #длительность паузы
