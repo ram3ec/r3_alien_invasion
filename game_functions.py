@@ -52,6 +52,9 @@ def check_keyup_events(event, ai_settings, screen, stats, ship, aliens, bullets)
         start_game(ai_settings, screen, stats, ship, aliens, bullets)
 
 def start_game(ai_settings, screen, stats, ship, aliens, bullets):
+    # Сброс игровых настроек.
+    ai_settings.initialize_dynamic_settings()
+
     # Указатель мыши скрывается.
     pygame.mouse.set_visible(False)
 
@@ -116,6 +119,7 @@ def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
     if len(aliens) == 0:
         # Уничтожение существующих пуль и создание нового флота.
         bullets.empty()
+        ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
 
 def update_bullets(ai_settings, screen, ship, aliens, bullets):
