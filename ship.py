@@ -1,10 +1,11 @@
-import aifc
-
 import pygame
+from pygame.sprite import Sprite
 
-class Ship():
+class Ship(Sprite):
     def __init__(self, ai_settings, screen):
         """Инициализирует корабль и задает его начальную позицию."""
+        super(Ship, self).__init__()
+
         self.screen = screen
         # настройки
         self.ai_settings = ai_settings
@@ -46,8 +47,10 @@ class Ship():
         self.rect.centerx = self.center
         self.rect.bottom = self.bottom
         self.rect.top = self.top
-        #print(self.rect.bottom,self.bottom)
 
     def center_ship(self):
         """Размещает корабль в центре нижней стороны."""
-        self.center = self.screen_rect.centerx
+        self.rect.centerx = self.screen_rect.centerx
+        self.rect.bottom = self.screen_rect.bottom
+        self.center = float(self.rect.centerx)
+        self.bottom = float(self.rect.bottom)

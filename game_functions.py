@@ -66,6 +66,7 @@ def start_game(ai_settings, screen, stats, sb, ship, aliens, bullets):
     sb.prep_score()
     sb.prep_high_score()
     sb.prep_level()
+    sb.prep_ships()
 
     # Очистка списков пришельцев и пуль.
     aliens.empty()
@@ -186,11 +187,13 @@ def create_fleet(ai_settings, screen, ship, aliens):
             create_alien(ai_settings, screen, aliens, alien_number, row_number)
 
 
-def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
+def ship_hit(ai_settings, stats, sb, screen, ship, aliens, bullets):
     """Обрабатывает столкновение корабля с пришельцем."""
     if stats.ships_left > 0:
         # Уменьшение ships_left.
         stats.ships_left -= 1
+
+        sb.prep_ships()
 
         # Очистка списков пришельцев и пуль.
         aliens.empty()
@@ -207,27 +210,27 @@ def ship_hit(ai_settings, stats, screen, ship, aliens, bullets):
         pygame.mouse.set_visible(True)
 
 
-def check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets):
+def check_aliens_bottom(ai_settings, stats, sb, screen, ship, aliens, bullets):
     """Проверяет, добрались ли пришельцы до нижнего края экрана."""
     screen_rect = screen.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= screen_rect.bottom:
            # Происходит то же, что при столкновении с кораблем.
-            ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+            ship_hit(ai_settings, stats, sb, screen, ship, aliens, bullets)
             break
 
 
-def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
+def update_aliens(ai_settings, stats, sb, screen, ship, aliens, bullets):
     """Обновляет позиции всех пришельцев во флоте"""
     check_fleet_edges(ai_settings, aliens)
     aliens.update()
 
     #проверка коллизии пришелец - корабдь
     if pygame.sprite.spritecollideany(ship, aliens):
-        ship_hit(ai_settings, stats, screen, ship, aliens, bullets)
+        ship_hit(ai_settings, stats, sb, screen, ship, aliens, bullets)
 
     #проверка добрался ли пришелец до нижнего края
-    check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
+    check_aliens_bottom(ai_settings, stats, sb, screen, ship, aliens, bullets)
 
 
 def check_fleet_edges(ai_settings, aliens):
