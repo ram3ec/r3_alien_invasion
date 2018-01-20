@@ -24,6 +24,7 @@ class Settings():
         # Настройка игры
         self.game_pause = 2                         # длительность паузы
         self.speedup_scale = 1.1                    # темп ускорения игры
+        self.score_scale = 2                        # темп роста стоимости пришельца
 
         self.initialize_dynamic_settings()
 
@@ -32,6 +33,7 @@ class Settings():
         self.ship_speed_factor = 1.5                # скорость корабля
         self.bullet_speed_factor = 3                # скорость пули
         self.alien_speed_factor = 1                 # скорость пришельцев
+        self.alien_points = 50                      # стоимость пришельца
         self.fleet_direction = 1                    # 1 - движение вправо, -1 - движение влево
 
     def increase_speed(self):
@@ -39,3 +41,4 @@ class Settings():
         self.ship_speed_factor *= self.speedup_scale
         self.bullet_speed_factor *= self.speedup_scale
         self.alien_speed_factor *= self.speedup_scale
+        self.alien_points = int(self.alien_points * self.score_scale)

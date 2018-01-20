@@ -92,7 +92,7 @@ def check_events(ai_settings, screen, stats, play_button, ship, aliens, bullets)
             check_play_button(ai_settings, screen, stats, play_button, ship, aliens, bullets, mouse_x, mouse_y)
 
 
-def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button):
+def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_button):
     """Обновляет изображение на экране и отображает новый экран"""
     #при каждом проходе цикла перерисовывается экран
     screen.fill(ai_settings.bg_color)
@@ -102,8 +102,8 @@ def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button
         bullet.draw_bullet()
 
     ship.blitme()
-
     aliens.draw(screen)
+    sb.show_score()
 
     # Кнопка Play отображается в том случае, если игра неактивна.
     if not stats.game_active:
@@ -112,17 +112,22 @@ def update_screen(ai_settings, screen, stats, ship, aliens, bullets, play_button
     #отображение последнего прорисованного экрана
     pygame.display.flip()
 
-def check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets):
+def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Обработка коллизий пуль с пришельцами."""
     # Удаление пуль и пришельцев, участвующих в коллизиях.
     collisions = pygame.sprite.groupcollide(bullets, aliens, ai_settings.bullet_inside, True)
+    if collisions:
+        for alien in collisions.values():
+            stats.score += (ai_settings.alien_points * len(alien))
+        sb.prep_score()
+
     if len(aliens) == 0:
         # Уничтожение существующих пуль и создание нового флота.
         bullets.empty()
         ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
 
-def update_bullets(ai_settings, screen, ship, aliens, bullets):
+def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Обновляет позиции пуль и уничтожает старые пули"""
     bullets.update()
 
@@ -131,7 +136,7 @@ def update_bullets(ai_settings, screen, ship, aliens, bullets):
         if bullet.rect.bottom <= 0:
             bullets.remove(bullet)
 
-    check_bullet_alien_collisions(ai_settings, screen, ship, aliens, bullets)
+    check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
 def get_number_aliens_x(ai_settings, alien_width):
     """Вычисляет количество пришельцев в ряду."""
