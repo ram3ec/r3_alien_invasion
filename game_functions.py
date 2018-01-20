@@ -112,6 +112,7 @@ def update_screen(ai_settings, screen, stats, sb, ship, aliens, bullets, play_bu
     #отображение последнего прорисованного экрана
     pygame.display.flip()
 
+
 def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Обработка коллизий пуль с пришельцами."""
     # Удаление пуль и пришельцев, участвующих в коллизиях.
@@ -120,12 +121,14 @@ def check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, 
         for alien in collisions.values():
             stats.score += (ai_settings.alien_points * len(alien))
         sb.prep_score()
+        check_high_score(stats, sb)
 
     if len(aliens) == 0:
         # Уничтожение существующих пуль и создание нового флота.
         bullets.empty()
         ai_settings.increase_speed()
         create_fleet(ai_settings, screen, ship, aliens)
+
 
 def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
     """Обновляет позиции пуль и уничтожает старые пули"""
@@ -138,11 +141,13 @@ def update_bullets(ai_settings, screen, stats, sb, ship, aliens, bullets):
 
     check_bullet_alien_collisions(ai_settings, screen, stats, sb, ship, aliens, bullets)
 
+
 def get_number_aliens_x(ai_settings, alien_width):
     """Вычисляет количество пришельцев в ряду."""
     available_space_x = ai_settings.screen_width - 2 * alien_width
     number_aliens_x = int(available_space_x / (2 * alien_width))
     return number_aliens_x
+
 
 def create_alien(ai_settings, screen, aliens, alien_number, row_number):
     """Создает пришельца и размещает его в ряду."""
@@ -152,6 +157,7 @@ def create_alien(ai_settings, screen, aliens, alien_number, row_number):
     alien.rect.x = alien.x
     alien.rect.y = alien.rect.height + 2 * alien.rect.height * row_number
     aliens.add(alien)
+
 
 def get_number_rows(ai_settings, ship_height, alien_height):
     """Определяет количество рядов, помещающихся на экране."""
@@ -215,6 +221,7 @@ def update_aliens(ai_settings, stats, screen, ship, aliens, bullets):
     #проверка добрался ли пришелец до нижнего края
     check_aliens_bottom(ai_settings, stats, screen, ship, aliens, bullets)
 
+
 def check_fleet_edges(ai_settings, aliens):
     """Реагирует на достижение пришельцем края экрана."""
     for alien in aliens.sprites():
@@ -222,8 +229,16 @@ def check_fleet_edges(ai_settings, aliens):
             change_fleet_direction(ai_settings, aliens)
             break
 
+
 def change_fleet_direction(ai_settings, aliens):
     """Опускает весь флот и меняет направление флота."""
     for alien in aliens.sprites():
         alien.rect.y += ai_settings.fleet_drop_speed
     ai_settings.fleet_direction *= -1
+
+
+def check_high_score(stats, sb):
+    """Проверяет, появился ли новый рекорд."""
+    if stats.score > stats.high_score:
+        stats.high_score = stats.score
+        sb.prep_high_score()
